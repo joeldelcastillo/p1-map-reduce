@@ -12,7 +12,7 @@ def partitions(file):
     fileNumber = 0
     with open(file, "rt") as f:
         while True:
-            buf = f.truncate()
+            buf = f.readlines(SIZE_HINT)
             print(buf)
             if not buf:
                 # we've read the entire file in, so we're done.
