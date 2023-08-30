@@ -1,1 +1,5 @@
-./fragments/*.txt
+# exclude everything
+fragments/*
+
+# exception to the rule
+!fragments/.gitkeep 
