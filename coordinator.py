@@ -4,8 +4,9 @@ import threading
 
 # Pame función para limpiar el texto
 
-
 # Polito parte esto
+
+
 def partitions(file):
 
     SIZE_HINT = 20*1024*1024  # Size in bytes of the partition
@@ -13,14 +14,20 @@ def partitions(file):
     # Open the file in read mode
     with open(file, "rt") as f:
         while True:
-            buf = f.read(SIZE_HINT)
+            buf = f.readlines(SIZE_HINT)
             print(buf)
-            print()
+            # use the function clean(buf)
+
+            # buf = clean(buf)--return an array
+
+            buf = "".join(buf)  # convert list to string
+            print("buff:", buf)
             if not buf:
                 # we've read the entire file in, so we're done.
                 break
             # create output file and write the partition
-            outFile = open("./outFile%d.txt" % fileNumber, "wt")
+
+            outFile = open("./outFile_%d.txt" % fileNumber, "wt")
             outFile.write(buf)
             outFile.close()
             fileNumber += 1
