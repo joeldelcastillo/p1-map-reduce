@@ -1,8 +1,20 @@
 # esto solo es dummy code
 
 import threading
- 
+import re
+import numpy as np
+
 # Pame función para limpiar el texto
+def clean_text(file):
+    pattern = r'[^\w\s]|http\S+'   
+    
+    #Usa expresion regular para remover puntuacion, simbolos y URLs 
+    cleaned_text = re.sub(pattern, '', file)    
+    
+    #Reemplaza los saltos de línea con espacios en blanco y elimina espacios en blanco adicionales
+    cleaned_text = cleaned_text.replace('\n', ' ').strip()    
+    
+    return cleaned_text.lower()
 
 
 # Polito parte esto
@@ -15,7 +27,7 @@ def partitions(file):
             buf = f.readlines(SIZE_HINT)
             print(buf)
             if not buf:
-                # we've read the entire file in, so we're done.
+               # we've read the entire file in, so we're done.
                 break
             outFile = open("./fragments/outFile%d.txt" % fileNumber, "wt")
             outFile.write(buf[0])
@@ -24,8 +36,10 @@ def partitions(file):
  
  
 if __name__ =="__main__":
-
+    
+    clean_text('input.txt')
     partitions("./input.txt")
+    
     # creating thread
     # t1 = threading.Thread(target=print_square, args=(10,))
     # t2 = threading.Thread(target=print_cube, args=(10,))
