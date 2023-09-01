@@ -1,10 +1,20 @@
 from mapper import Map
 from reducer import Reducer
 import threading
+import re
+import numpy as np
 
-def clean(buf):
-    #Logica de clean text
-    pass
+# Pame función para limpiar el texto
+def clean_text(file):
+    pattern = r'[^\w\s]|http\S+'   
+    
+    #Usa expresion regular para remover puntuacion, simbolos y URLs 
+    cleaned_text = re.sub(pattern, '', file)    
+    
+    #Reemplaza los saltos de línea con espacios en blanco y elimina espacios en blanco adicionales
+    cleaned_text = cleaned_text.replace('\n', ' ').strip()    
+    
+    return cleaned_text.lower()
 
 
 def partitions(file):
@@ -23,7 +33,7 @@ def partitions(file):
             buf = "".join(buf)  # convert list to string
             #print("buff:", buf)
             if not buf:
-                # we've read the entire file in, so we're done.
+               # we've read the entire file in, so we're done.
                 break
             # create output file and write the partition
 
