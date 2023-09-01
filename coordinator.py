@@ -1,4 +1,5 @@
 from mapper import Map
+from reducer import Reducer
 import threading
 
 def clean(buf):
@@ -38,3 +39,8 @@ if __name__ == "__main__":
     map_instance = Map()
     map_instance.chunk_identifier = 0
     map_instance.run()
+
+    reducer_instance = Reducer()
+    mapped_data = open("./results/mapped_data.txt", "rt", encoding="utf-8")
+    reducer_instance.reduce(mapped_data)
+    print("Done")
