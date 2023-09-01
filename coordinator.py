@@ -1,5 +1,10 @@
-
+from mapper import Map
 import threading
+
+def clean(buf):
+    #Logica de clean text
+    pass
+
 
 def partitions(file):
 
@@ -9,13 +14,13 @@ def partitions(file):
     with open(file, "rt", encoding="utf-8") as f:
         while True:
             buf = f.readlines(SIZE_HINT)
-            print(buf)
+            #print(buf)
             # use the function clean(buf)
 
-            # buf = clean(buf)--return an array
+            #buf = clean(buf)
 
             buf = "".join(buf)  # convert list to string
-            print("buff:", buf)
+            #print("buff:", buf)
             if not buf:
                 # we've read the entire file in, so we're done.
                 break
@@ -28,22 +33,7 @@ def partitions(file):
 
 
 if __name__ == "__main__":
-
-    partitions("./input.txt")
-    #partitions("./large_encyclopedia2.txt")
-    # creating thread
-    # t1 = threading.Thread(target=print_square, args=(10,))
-    # t2 = threading.Thread(target=print_cube, args=(10,))
-
-    # # starting thread 1
-    # t1.start()
-    # # starting thread 2
-    # t2.start()
-
-    # # wait until thread 1 is completely executed
-    # t1.join()
-    # # wait until thread 2 is completely executed
-    # t2.join()
-
-    # # both threads completely executed
-    # print("Done!")
+    partitions("./encyclopedia.txt")
+    map_instance = Map()
+    map_instance.chunk_identifier = 0
+    map_instance.run()

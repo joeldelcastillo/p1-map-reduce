@@ -24,16 +24,17 @@ class Map:
 
     def process_chunk(self):
         path = self.get_chunk_path()
-        with open(path) as File:
+        with open(path , encoding="utf-8") as File:
             mapped_data = []
             for line in File:
                 words = line.split()
                 for word in words:
                     mapped_data.append((word, 1))
+        self.has_ended = True
         return mapped_data
 
     def get_chunk_path(self):
-        path = "Files"  #editar
+        path = "./fragments"  
         chunk_number = self.chunk_identifier
-        chunk_path = path + "/" + chunk_number
+        chunk_path = f"{path}/chunk_{chunk_number}.txt"  
         return chunk_path
