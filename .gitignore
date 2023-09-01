@@ -5,3 +5,5 @@ fragments/*
 !fragments/.gitkeep 
 
 input/*
+
+results/*

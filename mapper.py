@@ -20,7 +20,8 @@ class Map:
                     self.failure = False
             else:
                 mapped_data = self.process_chunk()
-                print(mapped_data)   #Debug
+                #print(mapped_data)   #Debug
+                self.save_mapped_data_to_txt(mapped_data)
 
     def process_chunk(self):
         path = self.get_chunk_path()
@@ -38,3 +39,8 @@ class Map:
         chunk_number = self.chunk_identifier
         chunk_path = f"{path}/chunk_{chunk_number}.txt"  
         return chunk_path
+
+    def save_mapped_data_to_txt(self, mapped_data):
+        with open("./results/mapped_data.txt", 'w', encoding='utf-8') as file:
+            for item in mapped_data:
+                file.write(f"{item[0]}\t{item[1]}\n")

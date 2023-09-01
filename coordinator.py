@@ -33,7 +33,8 @@ def partitions(file):
 
 
 if __name__ == "__main__":
-    partitions("./encyclopedia.txt")
+    
+    partitions("./input/encyclopedia.txt")
     map_instance = Map()
     map_instance.chunk_identifier = 0
     map_instance.run()
