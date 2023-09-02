@@ -49,29 +49,25 @@ class Shuffler:
     
     def test_and_set(self):
         target = 0
+
         while(self.are_buckets_complete() == False):
-            self.save_result_to_txt(self.result[target], target)
-            self.completed_buckets[target] = True
-            target = (target + 1) % 26
-
-        
-
-        # target = 0
-        # while(len(self.completed_buckets) > 0):
-        #     print(self.completed_buckets[target])
-        #     acquired = self.file_locks[self.completed_buckets[target]].acquire(blocking=False)
-        #     while(acquired == False):
-        #         target = (target + 1) % len(self.completed_buckets)
-        #     if acquired:
-        #         try: # Critical section
-        #             self.completed_buckets.remove(self.completed_buckets[target])
-        #             self.save_result_to_txt(self.result[target], target)
-        #             if (len(self.completed_buckets) > 0):
-        #                 target = (target + 1) % len(self.completed_buckets)
-        #         finally:
-        #             self.file_locks[target].release()  # Release the lock when done
+            acquired = False
+            if (self.completed_buckets[target] == False):
+                acquired = self.file_locks[target].acquire(blocking=False)
+            while(acquired == False ):
+                target = (target + 1) % 26
+                acquired = self.file_locks[target].acquire(blocking=False)
+            if acquired:
+                try: # Critical section
+                    self.save_result_to_txt(self.result[target], target)
+                    self.completed_buckets[target] = True
+                    if (self.completed_buckets[(target + 1) % 26] == False):
+                        target = (target + 1) % 26
+                finally:
+                    self.file_locks[target].release() # Release the lock when done
                     
     def save_result_to_txt(self, bucket, target):
+
         with open("./3_shuffled_words/%s_shuffled_bucket.txt" % self.num_to_alpha[target], 'a') as file:
             for item in self.result[target]:
                 file.write(item)
