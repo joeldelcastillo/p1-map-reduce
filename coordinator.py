@@ -4,7 +4,6 @@ import threading
 import re
 import numpy as np
 
-# Pame función para limpiar el texto
 def clean_text(file):
     pattern = r'[^\w\s_]|http\S+'
 
