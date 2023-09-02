@@ -6,8 +6,8 @@ class Map:
     max_failed_attempts: int
     fileNumber: int
 
-    def __init__(self):
-        self.chunk_identifier = None
+    def __init__(self, chunk_identifier):
+        self.chunk_identifier = chunk_identifier
         self.failure = False
         self.has_ended = False
         self.max_failed_attempts = 3

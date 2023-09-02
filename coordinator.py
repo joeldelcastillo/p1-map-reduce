@@ -26,14 +26,36 @@ def partitions(file):
 if __name__ == "__main__":
     
     partitions("./0_input/encyclopedia.txt")
-    map_instance = Map()
-    map_instance.chunk_identifier = 0
-    map_instance.run()
+
+    _, _, files = next(os.walk("/usr/lib"))
+    mappers_count = len(files)
+    shufflers_count = mappers_count
+    reducers_count = mappers_count // 2
+
+    # Create instances of Mappers
+    mappers = [Map(i) for i in range(mappers_count)]
+    mappers_threads = []
+    for mapper in mappers:
+        thread = threading.Thread(target=mapper.run)
+        mappers_threads.append(thread)
+
+    # Create instances of Shufflers
+    file_locks = [threading.Semaphore(1) for _ in range(26)]
+    shufflers = [Shuffler(i, file_locks) for i in range(mappers_count)]
+    shufflers_threads = []
+    for shuffler in shufflers:
+        thread = threading.Thread(target=shuffler.run)
+        shufflers_threads.append(thread)
+
+    # Create instances of Reducers
+
 
     # Create a lock to synchronize access to the file
-    file_locks = [threading.Semaphore(1) for _ in range(26)]
-    shuffler_instance = Shuffler(0, file_locks)
-    shuffler_instance.run()
+
+
+        # Wait for all threads to finish
+    for thread in threads:
+        thread.join()
 
 
     # reducer_instance = Reducer()
