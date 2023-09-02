@@ -92,14 +92,14 @@ class Map:
         return words
 
     def get_chunk_path(self):
-        path = "./fragments"  
+        path = "./1_fragments"  
         chunk_number = self.chunk_identifier
         chunk_path = f"{path}/chunk_{chunk_number}.txt"  
         return chunk_path
 
     def save_mapped_data_to_txt(self, mapped_data):
-        with open("./results/mapped_data_%d.txt" % self.fileNumber, 'w', encoding='utf-8') as file:
-            for item in mapped_data:
-                file.write(f"{item}\t{mapped_data[item]}\n")
+        with open("./2_mapped_chunks/mapped_data_%d.txt" % self.fileNumber, 'w', encoding='utf-8') as file:
+            for key, value in mapped_data():
+                file.write(f"{key}\t{value}\n")
                 # file.write(f"{item}\t{item[1]}\n")
             self.fileNumber += 1
