@@ -1,41 +1,16 @@
 from mapper import Map
 from reducer import Reducer
 import threading
-import re
-import numpy as np
-
-def clean_text(file):
-    pattern = r'[^\w\s_]|http\S+'
-
-    #Usa expresion regular para remover puntuacion, simbolos y URLs 
-    cleaned_text = re.sub(pattern, '', file)    
-    
-    #Reemplaza los saltos de línea con espacios en blanco y elimina espacios en blanco adicionales
-    #cleaned_text = cleaned_text.replace('_', '').strip()    
-    
-    return cleaned_text.lower()
-
 
 def partitions(file):
 
     SIZE_HINT = 20*1024*1024  # Size in bytes of the partition
     fileNumber = 0  # Number of the file
-    # Open the file in read mode
     with open(file, "rt", encoding="utf-8") as f:
         while True:
-            buf = f.readlines(SIZE_HINT)
-            #print(buf)
-            
-            # use the function to clean the text
-            buf = [clean_text(line) for line in buf]
-
-            buf = "".join(buf)  # convert list to string
-            #print("buff:", buf)
+            buf = f.read(SIZE_HINT)
             if not buf:
-               # we've read the entire file in, so we're done.
                 break
-            # create output file and write the partition
-
             outFile = open("./fragments/chunk_%d.txt" % fileNumber, "wt", encoding="utf-8")
             outFile.write(buf)
             outFile.close()
@@ -49,7 +24,18 @@ if __name__ == "__main__":
     map_instance.chunk_identifier = 0
     map_instance.run()
 
-    reducer_instance = Reducer()
-    mapped_data = open("./results/mapped_data.txt", "rt", encoding="utf-8")
-    reducer_instance.reduce(mapped_data)
-    print("Done")
+    # reducer_instance = Reducer()
+    # mapped_data = open("./results/mapped_data.txt", "rt", encoding="utf-8")
+    # reducer_instance.reduce(mapped_data)
+    # print("Done")
+
+
+
+
+
+
+
+# input_string = "Hello, hello World! This is a test_string. \n It's example_123."
+# result = clean_split_and_count(input_string)
+# print(result)
+

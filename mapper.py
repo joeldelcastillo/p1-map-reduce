@@ -14,27 +14,82 @@ class Map:
         self.fileNumber = 0
 
     def run(self):
-        while not self.has_ended:
-            if self.failure:
-                if self.max_failed_attempts <= 0:
-                    self.has_ended = True
-                else:
-                    self.failure = False
-            else:
-                mapped_data = self.process_chunk()
-                #print(mapped_data)   #Debug
-                self.save_mapped_data_to_txt(mapped_data)
+        mapped_data = self.process_chunk()
+        self.save_mapped_data_to_txt(mapped_data)
+        # while not self.has_ended:
+        #     if self.failure:
+        #         if self.max_failed_attempts <= 0:
+        #             self.has_ended = True
+        #         else:
+        #             self.failure = False
+        #     else:
+        #         mapped_data = self.process_chunk()
+                #print(mapped_data) 
+                # self.save_mapped_data_to_txt(mapped_data)
+
+
+    def clean_and_split(self, input_string):
+        words = []
+        current_word = []
+        
+        for char in input_string:
+            if char.isalpha(): 
+                current_word.append(char.lower())
+
+            elif char.isspace():
+                if(len(current_word) > 0):
+                    words.append(''.join(current_word))
+                    current_word = []
+
+        if current_word:
+            words.append(''.join(current_word))
+            current_word = []
+        
+        return words
+
+
+    def clean_split_and_count(self, input_string):
+        word_counter = {}
+        current_word = []
+        
+        for char in input_string:
+            if char.isalpha(): 
+                current_word.append(char.lower())
+
+            elif char.isspace():
+                if(len(current_word) > 0):
+                    word = ''.join(current_word)
+                    if word not in word_counter:
+                        word_counter[word] = 0 
+                    word_counter[word] += 1
+                    current_word = []
+
+        if current_word:
+            word = ''.join(current_word)
+            if word not in word_counter:
+                word_counter[word] = 0 
+            word_counter[word] += 1
+            current_word = []
+        
+        return word_counter
+
+    # def process_chunk(self):
+    #     path = self.get_chunk_path()
+    #     text_file = open(path, encoding="utf-8")
+    #     data = text_file.read()
+    #     words = self.clean_and_split(data)
+    #     print(words)
+    #     text_file.close()
+    #     return words
 
     def process_chunk(self):
         path = self.get_chunk_path()
-        with open(path , encoding="utf-8") as File:
-            mapped_data = []
-            for line in File:
-                words = line.split()
-                for word in words:
-                    mapped_data.append((word, 1))
-        self.has_ended = True
-        return mapped_data
+        text_file = open(path, encoding="utf-8")
+        data = text_file.read()
+        words = self.clean_split_and_count(data)
+        print(words)
+        text_file.close()
+        return words
 
     def get_chunk_path(self):
         path = "./fragments"  
@@ -45,5 +100,6 @@ class Map:
     def save_mapped_data_to_txt(self, mapped_data):
         with open("./results/mapped_data_%d.txt" % self.fileNumber, 'w', encoding='utf-8') as file:
             for item in mapped_data:
-                file.write(f"{item[0]}\t{item[1]}\n")
+                file.write(f"{item}\t{mapped_data[item]}\n")
+                # file.write(f"{item}\t{item[1]}\n")
             self.fileNumber += 1
