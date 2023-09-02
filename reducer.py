@@ -1,6 +1,10 @@
 class Reducer:
+
+    fileNumber: int
+
     def __init__(self):
         self.result = {}
+        self.fileNumber = 0
 
 
     def reduce(self, mapped_data):
@@ -15,6 +19,7 @@ class Reducer:
         self.save_result_to_txt()
 
     def save_result_to_txt(self):
-        with open("./results/reduce.txt", 'w', encoding='utf-8') as file:
+        with open("./results/reduced_%d.txt" % self.fileNumber, 'w', encoding='utf-8') as file:
             for key, value in self.result.items():
                 file.write(f"{key}\t{value}\n")
+            self.fileNumber += 1

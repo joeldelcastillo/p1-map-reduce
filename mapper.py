@@ -4,12 +4,14 @@ class Map:
     failure: bool
     chunk_identifier: str
     max_failed_attempts: int
+    fileNumber: int
 
     def __init__(self):
         self.chunk_identifier = None
         self.failure = False
         self.has_ended = False
         self.max_failed_attempts = 3
+        self.fileNumber = 0
 
     def run(self):
         while not self.has_ended:
@@ -41,6 +43,7 @@ class Map:
         return chunk_path
 
     def save_mapped_data_to_txt(self, mapped_data):
-        with open("./results/mapped_data.txt", 'w', encoding='utf-8') as file:
+        with open("./results/mapped_data_%d.txt" % self.fileNumber, 'w', encoding='utf-8') as file:
             for item in mapped_data:
                 file.write(f"{item[0]}\t{item[1]}\n")
+            self.fileNumber += 1
