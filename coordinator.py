@@ -22,7 +22,6 @@ def partitions(file):
             outFile.close()
             fileNumber += 1
 
-
 if __name__ == "__main__":
     
     partitions("./0_input/encyclopedia.txt")
@@ -61,7 +60,6 @@ if __name__ == "__main__":
     # Wait for all Mapper Threads to finish
     for thread in mappers_threads:
         thread.join()
-
     
     # Starting Shuffler Threads
     for thread in shufflers_threads:
