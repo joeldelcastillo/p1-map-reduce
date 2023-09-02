@@ -57,7 +57,9 @@ class Map:
                 current_word.append(char.lower())
 
             elif char.isspace():
-                if(len(current_word) > 0):
+                if(len(current_word) < 2):
+                    current_word = []
+                if(len(current_word) > 1):
                     word = ''.join(current_word)
                     if word not in word_counter:
                         word_counter[word] = 0 
@@ -99,7 +101,7 @@ class Map:
 
     def save_mapped_data_to_txt(self, mapped_data):
         with open("./2_mapped_chunks/mapped_data_%d.txt" % self.fileNumber, 'w', encoding='utf-8') as file:
-            for key, value in mapped_data():
+            for key, value in mapped_data.items():
                 file.write(f"{key}\t{value}\n")
                 # file.write(f"{item}\t{item[1]}\n")
             self.fileNumber += 1
