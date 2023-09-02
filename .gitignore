@@ -3,3 +3,7 @@ fragments/*
 
 # exception to the rule
 !fragments/.gitkeep 
+
+input/*
+
+results/*
