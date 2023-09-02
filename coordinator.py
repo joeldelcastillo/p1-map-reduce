@@ -6,13 +6,13 @@ import numpy as np
 
 # Pame función para limpiar el texto
 def clean_text(file):
-    pattern = r'[^\w\s]|http\S+'   
-    
+    pattern = r'[^\w\s_]|http\S+'
+
     #Usa expresion regular para remover puntuacion, simbolos y URLs 
     cleaned_text = re.sub(pattern, '', file)    
     
     #Reemplaza los saltos de línea con espacios en blanco y elimina espacios en blanco adicionales
-    cleaned_text = cleaned_text.replace('\n', ' ').strip()    
+    #cleaned_text = cleaned_text.replace('_', '').strip()    
     
     return cleaned_text.lower()
 
@@ -26,9 +26,9 @@ def partitions(file):
         while True:
             buf = f.readlines(SIZE_HINT)
             #print(buf)
-            # use the function clean(buf)
-
-            #buf = clean(buf)
+            
+            # use the function to clean the text
+            buf = [clean_text(line) for line in buf]
 
             buf = "".join(buf)  # convert list to string
             #print("buff:", buf)
