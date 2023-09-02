@@ -14,6 +14,8 @@ class Map:
         self.fileNumber = 0
 
     def run(self):
+        print("Mapper: ")
+        print(self.chunk_identifier)
         mapped_data = self.process_chunk()
         self.save_mapped_data_to_txt(mapped_data)
         # while not self.has_ended:
@@ -100,8 +102,7 @@ class Map:
         return chunk_path
 
     def save_mapped_data_to_txt(self, mapped_data):
-        with open("./2_mapped_chunks/mapped_data_%d.txt" % self.fileNumber, 'w', encoding='utf-8') as file:
+        with open("./2_mapped_chunks/mapped_data_%d.txt" % self.chunk_identifier, 'w', encoding='utf-8') as file:
             for key, value in mapped_data.items():
                 file.write(f"{key}\t{value}\n")
                 # file.write(f"{item}\t{item[1]}\n")
-            self.fileNumber += 1

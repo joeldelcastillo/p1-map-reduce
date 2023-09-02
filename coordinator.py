@@ -27,7 +27,7 @@ if __name__ == "__main__":
     
     partitions("./0_input/encyclopedia.txt")
 
-    _, _, files = next(os.walk("/usr/lib"))
+    _, _, files = next(os.walk("./1_fragments"))
     mappers_count = len(files)
     shufflers_count = mappers_count
     reducers_count = mappers_count // 2
@@ -41,6 +41,7 @@ if __name__ == "__main__":
 
     # Create instances of Shufflers
     file_locks = [threading.Semaphore(1) for _ in range(26)]
+        # Create a lock to synchronize access to the files
     shufflers = [Shuffler(i, file_locks) for i in range(mappers_count)]
     shufflers_threads = []
     for shuffler in shufflers:
@@ -50,26 +51,11 @@ if __name__ == "__main__":
     # Create instances of Reducers
 
 
-    # Create a lock to synchronize access to the file
 
+    # Starting Mappers Threads
+    for thread in mappers_threads:
+        thread.start()
 
-        # Wait for all threads to finish
-    for thread in threads:
+    # Wait for all Mapper Threads to finish
+    for thread in mappers_threads:
         thread.join()
-
-
-    # reducer_instance = Reducer()
-    # mapped_data = open("./results/mapped_data.txt", "rt", encoding="utf-8")
-    # reducer_instance.reduce(mapped_data)
-    # print("Done")
-
-
-
-
-
-
-
-# input_string = "Hello, hello World! This is a test_string. \n It's example_123."
-# result = clean_split_and_count(input_string)
-# print(result)
-
