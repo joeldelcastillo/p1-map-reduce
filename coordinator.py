@@ -33,6 +33,8 @@ if __name__ == "__main__":
     reducers_count = mappers_count // 2
 
     # Create instances of Mappers
+
+    # TO DO: Mappers should not take in count first and last word (because of fragmentation)
     mappers = [Map(i) for i in range(mappers_count)]
     mappers_threads = []
     for mapper in mappers:
@@ -59,3 +61,13 @@ if __name__ == "__main__":
     # Wait for all Mapper Threads to finish
     for thread in mappers_threads:
         thread.join()
+
+    
+    # Starting Shuffler Threads
+    for thread in shufflers_threads:
+        thread.start()
+
+    # Wait for all Shuffler Threads to finish
+    for thread in shufflers_threads:
+        thread.join()
+

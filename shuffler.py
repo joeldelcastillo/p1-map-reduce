@@ -7,7 +7,7 @@ class Shuffler:
     def __init__(self, chunk_identifier, file_locks):
         self.result = [ [] for _ in range(26) ]
         self.chunk_identifier = chunk_identifier
-        self.file = "./2_mapped_chunks/mapped_data_0.txt"
+        self.file = self.get_chunk_path()
         self.file_locks = file_locks
         self.completed_buckets = [ False for _ in range(26) ]
         self.alpha_to_num = {
