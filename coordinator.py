@@ -6,6 +6,7 @@ import threading
 import os
 import shutil
 import numpy as np
+import multiprocessing
 
 
 def partitions(file):
@@ -59,6 +60,14 @@ def merge_files():
         file.writelines(sort_text)
 
 
+def run_mapper(mapper):
+    return mapper.run()
+
+
+def run_reducer(reducer):
+    return reducer.reduce()
+
+
 if __name__ == "__main__":
     num_to_alpha = {
         0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h', 8: 'i', 9: 'j',
@@ -76,12 +85,20 @@ if __name__ == "__main__":
     # Create instances of Mappers
 
     # TO DO: Mappers should not take in count first and last word (because of fragmentation)
+    map_pool = multiprocessing.Pool(processes=mappers_count)
+    reducer_pool = multiprocessing.Pool(processes=reducers_count)
+
     mappers = [Map(i) for i in range(mappers_count)]
-    mappers_threads = []
+
+    map_pool.map(run_mapper, mappers)
+
+    map_pool.close()
+    map_pool.join()
+    """    mappers_threads = []
     for mapper in mappers:
         thread = threading.Thread(target=mapper.run)
         mappers_threads.append(thread)
-
+    """
     # Create instances of Shufflers
     file_locks = [threading.Semaphore(1) for _ in range(26)]
     # Create a lock to synchronize access to the files
@@ -91,8 +108,26 @@ if __name__ == "__main__":
         thread = threading.Thread(target=shuffler.run)
         shufflers_threads.append(thread)
 
-    # Create instances of Reducers
+    # Starting Shuffler Threads
+    for thread in shufflers_threads:
+        thread.start()
 
+    # Wait for all Shuffler Threads to finish
+    for thread in shufflers_threads:
+        thread.join()
+
+    # Create instances of Reducers
+    shuffler_list = os.listdir('./3_shuffled_words')
+    shuffler_list = np.array_split(shuffler_list, reducers_count)
+    print(shuffler_list)
+    reducers = [Reducer(num_to_alpha[i], i, list(shuffler_list[i]))
+                for i in range(reducers_count)]
+
+    reducer_pool.map(run_reducer, reducers)
+    reducer_pool.close()
+    reducer_pool.join()
+
+    """
     # Starting Mappers Threads
     for thread in mappers_threads:
         thread.start()
@@ -107,14 +142,9 @@ if __name__ == "__main__":
 
     # Wait for all Shuffler Threads to finish
     for thread in shufflers_threads:
-        thread.join()
+        thread.join()"""
 
-    shuffler_list = os.listdir('./3_shuffled_words')
-    shuffler_list = np.array_split(shuffler_list, reducers_count)
-    print(shuffler_list)
-    reducers = [Reducer(num_to_alpha[i], i, list(shuffler_list[i]))
-                for i in range(reducers_count)]
-    reducers_threads = []
+    """    reducers_threads = []
 
     for reducer in reducers:
         thread = threading.Thread(target=reducer.reduce)
@@ -126,6 +156,6 @@ if __name__ == "__main__":
 
     # Wait for all Reducer Threads to finish
     for thread in reducers_threads:
-        thread.join()
+        thread.join()"""
 
     merge_files()
