@@ -5,6 +5,7 @@ from shuffler import Shuffler
 import threading
 import os
 import shutil
+import numpy as np
 
 
 def partitions(file):
@@ -70,8 +71,8 @@ if __name__ == "__main__":
     _, _, files = next(os.walk("./1_fragments"))
     mappers_count = len(files)
     shufflers_count = mappers_count
-    #reducers_count = mappers_count // 2
-    reducers_count = 26
+    reducers_count = mappers_count // 2
+    #reducers_count = 26
     # Create instances of Mappers
 
     # TO DO: Mappers should not take in count first and last word (because of fragmentation)
@@ -91,12 +92,6 @@ if __name__ == "__main__":
         shufflers_threads.append(thread)
 
     # Create instances of Reducers
-    reducers = [Reducer(num_to_alpha[i], i) for i in range(reducers_count)]
-    reducers_threads = []
-
-    for reducer in reducers:
-        thread = threading.Thread(target=reducer.reduce)
-        reducers_threads.append(thread)
 
     # Starting Mappers Threads
     for thread in mappers_threads:
@@ -113,6 +108,17 @@ if __name__ == "__main__":
     # Wait for all Shuffler Threads to finish
     for thread in shufflers_threads:
         thread.join()
+
+    shuffler_list = os.listdir('./3_shuffled_words')
+    shuffler_list = np.array_split(shuffler_list, reducers_count)
+    print(shuffler_list)
+    reducers = [Reducer(num_to_alpha[i], i, list(shuffler_list[i]))
+                for i in range(reducers_count)]
+    reducers_threads = []
+
+    for reducer in reducers:
+        thread = threading.Thread(target=reducer.reduce)
+        reducers_threads.append(thread)
 
     # Starting Reducer Threads
     for thread in reducers_threads:

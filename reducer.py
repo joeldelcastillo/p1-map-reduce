@@ -5,30 +5,30 @@ class Reducer:
 
     fileNumber: int
 
-    def __init__(self, chunk_identifier, fileNumber):
+    def __init__(self, chunk_identifier, fileNumber, textFiles):
         self.chunk_identifier = chunk_identifier
         self.result = {}
         self.fileNumber = fileNumber
+        self.textFiles = textFiles
 
     def reduce(self):
 
-        with open("./3_shuffled_words/%s_shuffled_bucket.txt" % self.chunk_identifier, "rt") as file:
+        print(self.textFiles)
 
-            for line in file:
-                print(line)
-                # Dividir cada línea en clave y valor
-                parts = line.split()
-                print(parts)
-                key, value = parts
-                print(key, value)
-                if key in self.result:
-                    # Convierte el valor a entero
-                    self.result[key] += int(value)
-                else:
-                    # Convierte el valor a entero`
-                    self.result[key] = int(value)
+        for nameFile in self.textFiles:
+            with open("./3_shuffled_words/%s" % nameFile, "rt") as file:
 
-            print(self.result)
+                for line in file:
+                    # Dividir cada línea en clave y valor
+                    parts = line.split()
+                    key, value = parts
+
+                    if key in self.result:
+                        # Convierte el valor a entero
+                        self.result[key] += int(value)
+                    else:
+                        # Convierte el valor a entero`
+                        self.result[key] = int(value)
 
         self.save_result_to_txt()
 
