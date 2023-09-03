@@ -18,16 +18,6 @@ class Map:
     def run(self):
         mapped_data = self.process_chunk()
         self.save_mapped_data_to_txt(mapped_data)
-        # while not self.has_ended:
-        #     if self.failure:
-        #         if self.max_failed_attempts <= 0:
-        #             self.has_ended = True
-        #         else:
-        #             self.failure = False
-        #     else:
-        #         mapped_data = self.process_chunk()
-        # print(mapped_data)
-        # self.save_mapped_data_to_txt(mapped_data)
 
     def clean_and_split(self, input_string):
         words = []
@@ -75,21 +65,12 @@ class Map:
 
         return word_counter
 
-    # def process_chunk(self):
-    #     path = self.get_chunk_path()
-    #     text_file = open(path, encoding="utf-8")
-    #     data = text_file.read()
-    #     words = self.clean_and_split(data)
-    #     print(words)
-    #     text_file.close()
-    #     return words
 
     def process_chunk(self):
         path = self.get_chunk_path()
         text_file = open(path, encoding="utf-8")
         data = text_file.read()
         words = self.clean_split_and_count(data)
-        print(words)
         text_file.close()
         return words
 

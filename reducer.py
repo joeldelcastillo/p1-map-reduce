@@ -12,22 +12,16 @@ class Reducer:
         self.textFiles = textFiles
 
     def reduce(self):
-
-        print(self.textFiles)
-
         for nameFile in self.textFiles:
             with open("./3_shuffled_words/%s" % nameFile, "rt") as file:
 
                 for line in file:
-                    # Dividir cada línea en clave y valor
                     parts = line.split()
                     key, value = parts
 
                     if key in self.result:
-                        # Convierte el valor a entero
                         self.result[key] += int(value)
                     else:
-                        # Convierte el valor a entero`
                         self.result[key] = int(value)
 
         self.save_result_to_txt()

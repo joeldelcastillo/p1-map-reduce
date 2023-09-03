@@ -1,6 +1,4 @@
-import os
-import threading
-import random
+
 
 
 class Shuffler:
@@ -39,8 +37,7 @@ class Shuffler:
                     first_letter = line[0]
                     # if first_letter in letter_buckets:
                     self.result[self.alpha_to_num[first_letter]].append(line)
-        print(self.result)
-
+        
     def are_buckets_complete(self):
         for item in self.completed_buckets:
             if (item == False):

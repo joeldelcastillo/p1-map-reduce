@@ -127,7 +127,7 @@ class Coordinator:
         reducers = [Reducer(num_to_alpha[i], i, list(shuffler_list[i]))
                     for i in range(reducers_count)]
 
-        reducer_pool.map(run_reducer, reducers)
+        reducer_pool.map(self.run_reducer, reducers)
         reducer_pool.close()
         reducer_pool.join()
 
