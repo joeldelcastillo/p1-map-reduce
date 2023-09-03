@@ -16,8 +16,6 @@ class Map:
         self.fileNumber = 0
 
     def run(self):
-        print("Mapper: ")
-        print(self.chunk_identifier)
         mapped_data = self.process_chunk()
         self.save_mapped_data_to_txt(mapped_data)
         # while not self.has_ended:
