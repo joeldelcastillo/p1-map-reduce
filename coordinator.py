@@ -9,21 +9,20 @@ import numpy as np
 import multiprocessing
 
 
+import glob
+
 class Coordinator:
     status_mappers: list
     status_shufflers: list
     status_reducers: list
 
     def __init__(self, input_file):
-        self.cpu_count = os.cpu_count()
+        self.cpu_count = os.cpu_count() if os.cpu_count() else 2
         self.input_file = input_file
 
     def partitions(self):
 
-        file_size = os.path.getsize(self.input_file)
-        # SIZE_HINT = file_size // (26 * 2) #letters in the anglophone alphabet
-        SIZE_HINT = file_size // (10)  # letters in the anglophone alphabet
-        # SIZE_HINT = 20*1024*1024
+        SIZE_HINT = 20*1024*1024
         char = ""
         fileNumber = 0
 
@@ -51,11 +50,11 @@ class Coordinator:
 
 
     def merge_files(self):
-        path = "./results"
-        output_file = "count_text.txt"
+        path = "./4_reduced_words"
+        output_file = "RESULT.txt"
 
         files = [os.path.join(path, file)
-                for file in os.listdir(path) if file.endswith('.txt')]
+            for file in os.listdir(path) if file.endswith('.txt')]
 
         with open(output_file, 'wt') as outfile:
             for file in files:
@@ -67,72 +66,134 @@ class Coordinator:
 
         with open(output_file, 'wt') as file:
             file.writelines(sort_text)
-    
-    def run_mapper(self, mapper):
-        return mapper.run()
 
-    def run_reducer(self, reducer):
-        return reducer.reduce()
+    def mapper_status_helper(self):
+        helper_list = []
+        for i in range(len(self.status_mappers)):
+            current_failed_index = i
+            for j in range(len(self.status_mappers[i])):
+                if(self.status_mappers[i][j] == False):
+                    helper_list.append(current_failed_index)
+                    continue
+        return helper_list
 
-    def run(self):
-        num_to_alpha = {
-            0: 'a', 1: 'b', 2: 'c', 3: 'd', 4: 'e', 5: 'f', 6: 'g', 7: 'h', 8: 'i', 9: 'j',
-            10: 'k', 11: 'l', 12: 'm', 13: 'n', 14: 'o', 15: 'p', 16: 'q', 17: 'r', 18: 's',
-            19: 't', 20: 'u', 21: 'v', 22: 'w', 23: 'x', 24: 'y', 25: 'z'
-        }
-        self.partitions()
-        
+
+    def run_mappers(self):
         _, _, files = next(os.walk("./1_fragments"))
-        mappers_count = len(files)
-        shufflers_count = mappers_count
-        reducers_count = mappers_count // 2
+        statuses = ([False for _ in range(len(files))])
+        statuses = np.array_split(statuses, self.cpu_count)
+        self.status_mappers = [arr.tolist() for arr in statuses]
+        mappers_count = self.cpu_count
 
-        ## create statuses per node
+        attempts = 0
+        while attempts < 3:
 
+            if(len(self.mapper_status_helper()) == 0):
+                break
 
+            mappers = [Map(self.mapper_status_helper()[i], self.status_mappers) for i in range(len(self.mapper_status_helper()))]
+            mappers_threads = []
+            for mapper in mappers:
+                thread = threading.Thread(target=mapper.run)
+                mappers_threads.append(thread)
 
+            # Starting Mappers Threads
+            for thread in mappers_threads:
+                thread.start()
 
+            # Wait for all Mapper Threads to finish
+            for thread in mappers_threads:
+                thread.join()
+            
+            attempts += 1
+
+    def check_status_shufflers():
+        for status in self.status_shufflers:
+            if (status == False):
+                return False
+        return True
+
+    def run_shufflers(self):
+
+        attempts = 0
+        while attempts < 3:
+            
+            if(self.check_status_shufflers == True):
+                break
+
+            directory = './3_shuffled_words'
+            for _file in os.listdir(directory):
+                file_route = os.path.join(directory, _file)
+                if os.path.exists(file_route):
+                    os.remove(file_route)
+            
+            shufflers_count = self.cpu_count
+            self.status_shufflers = [False for _ in range(shufflers_count)]
+            # Create instances of Shufflers
+            file_locks = [threading.Semaphore(1) for _ in range(26)]
+            # Create a lock to synchronize access to the files
+            shufflers = [Shuffler(i, file_locks, self.status_shufflers) for i in range(shufflers_count)]
+            shufflers_threads = []
+            for shuffler in shufflers:
+                thread = threading.Thread(target=shuffler.run)
+                shufflers_threads.append(thread)
+
+            # Starting Shuffler Threads
+            for thread in shufflers_threads:
+                thread.start()
+
+            # Wait for all Shuffler Threads to finish
+            for thread in shufflers_threads:
+                thread.join()
+
+            attempts += 1
+
+    def check_status_reducers(self):
+        helper_list_reducer = []
+        for index in range(len(self.status_reducers)):
+            if (self.status_reducers[index] == False):
+                helper_list_reducer.append(index)
+        return helper_list_reducer
+    
+    def run_reducers(self):
+        reducers_count = self.cpu_count // 2
+        self.status_reducers = [False for _ in range(reducers_count)]
 
         
-        # Create instances of Mappers
-
-        map_pool = multiprocessing.Pool(processes=mappers_count)
-        reducer_pool = multiprocessing.Pool(processes=reducers_count)
-        mappers = [Map(i) for i in range(mappers_count)]
-        map_pool.map(self.run_mapper, mappers)
-        map_pool.close()
-        map_pool.join()
-
-        # Create instances of Shufflers
-        file_locks = [threading.Semaphore(1) for _ in range(26)]
-        # Create a lock to synchronize access to the files
-        shufflers = [Shuffler(i, file_locks) for i in range(mappers_count)]
-        shufflers_threads = []
-        for shuffler in shufflers:
-            thread = threading.Thread(target=shuffler.run)
-            shufflers_threads.append(thread)
-
-        # Starting Shuffler Threads
-        for thread in shufflers_threads:
-            thread.start()
-
-        # Wait for all Shuffler Threads to finish
-        for thread in shufflers_threads:
-            thread.join()
-
-        # Create instances of Reducers
         shuffler_list = os.listdir('./3_shuffled_words')
         shuffler_list = np.array_split(shuffler_list, reducers_count)
-        print(shuffler_list)
-        reducers = [Reducer(num_to_alpha[i], i, list(shuffler_list[i]))
-                    for i in range(reducers_count)]
+        
+        attempts = 0
+        while attempts < 3:
 
-        reducer_pool.map(self.run_reducer, reducers)
-        reducer_pool.close()
-        reducer_pool.join()
+            reducers_list = self.check_status_reducers()
+            if(len(reducers_list) == 0):
+                break
+                
+            reducers = [Reducer(i, list(shuffler_list[i]), self.status_reducers) for i in range(len(reducers_list))]
+            reducer_threads = []
+            for reducer in reducers:
+                thread = threading.Thread(target=reducer.run)
+                reducer_threads.append(thread)
 
+            # Starting Shuffler Threads
+            for thread in reducer_threads:
+                thread.start()
+
+            # Wait for all Shuffler Threads to finish
+            for thread in reducer_threads:
+                thread.join()
+
+            print(self.status_reducers)
+            attempts += 1
+
+    def run(self):
+
+        self.partitions()
+        self.run_mappers()
+        self.run_shufflers()
+        self.run_reducers()
         self.merge_files()
-
 
 
 if __name__ == "__main__":

@@ -1,11 +1,9 @@
-
-
-
 class Shuffler:
 
-    def __init__(self, chunk_identifier, file_locks):
+    def __init__(self, identifier, file_locks, status_shufflers):
+        self.status_shufflers = status_shufflers
         self.result = [[] for _ in range(26)]
-        self.chunk_identifier = chunk_identifier
+        self.identifier = identifier
         self.file = self.get_chunk_path()
         self.file_locks = file_locks
         self.completed_buckets = [False for _ in range(26)]
@@ -23,10 +21,11 @@ class Shuffler:
     def run(self):
         self.shuffle_by_letter()
         self.test_and_set()
+        self.status_shufflers[self.identifier] = True
 
     def get_chunk_path(self):
         path = "./2_mapped_chunks"
-        chunk_number = self.chunk_identifier
+        chunk_number = self.identifier
         chunk_path = f"{path}/mapped_data_{chunk_number}.txt"
         return chunk_path
 
@@ -46,7 +45,6 @@ class Shuffler:
 
     def test_and_set(self):
         target = 0
-
         while (self.are_buckets_complete() == False):
             acquired = False
             if (self.completed_buckets[target] == False):
@@ -65,7 +63,6 @@ class Shuffler:
                     self.file_locks[target].release()
 
     def save_result_to_txt(self, bucket, target):
-
         with open("./3_shuffled_words/%s_shuffled_bucket.txt" % self.num_to_alpha[target], 'a') as file:
             for item in self.result[target]:
                 file.write(item)
