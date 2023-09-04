@@ -17,8 +17,10 @@ class Reducer:
 
                 for line in file:
                     parts = line.split()
+                    if len(parts) < 2:
+                        continue
                     key, value = parts
-
+                    
                     if key in self.result:
                         self.result[key] += int(value)
                     else:

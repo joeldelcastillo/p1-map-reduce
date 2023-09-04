@@ -1,5 +1,5 @@
 import os
-
+import re
 
 class Map:
    
@@ -41,7 +41,9 @@ class Map:
 
         for char in input_string:
             if char.isalpha():
-                current_word.append(char.lower())
+                great_char = ord(char)
+                if ((great_char >= 65 and great_char <= 90) or (great_char >= 97 and great_char <= 122)):
+                    current_word.append(char.lower())
 
             elif char.isspace():
                 if (len(current_word) < 2):

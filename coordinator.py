@@ -22,7 +22,9 @@ class Coordinator:
 
     def partitions(self):
 
-        SIZE_HINT = 20*1024*1024
+        #SIZE_HINT = 20*1024*1024
+        file_size = os.path.getsize(self.input_file)
+        SIZE_HINT = file_size // (48)
         char = ""
         fileNumber = 0
 
@@ -34,19 +36,19 @@ class Coordinator:
 
         with open(self.input_file, "rt", encoding="utf-8") as f:
             while True:
-                buf = f.read(1)
+                buf = f.read(SIZE_HINT)
                 if not buf:
                     break
-                char += buf
+                #char += buf
 
-                if buf.isspace() and len(char) >= SIZE_HINT:
+                #if buf.isspace() and len(char) >= SIZE_HINT:
 
-                    outFile = open(output_directory + "/chunk_%d.txt" %
-                                fileNumber, "wt", encoding="utf-8")
-                    outFile.write(char)
-                    outFile.close()
-                    char = ""
-                    fileNumber += 1
+                outFile = open(output_directory + "/chunk_%d.txt" %
+                            fileNumber, "wt", encoding="utf-8")
+                outFile.write(buf)
+                outFile.close()
+                #char = ""
+                fileNumber += 1
 
 
     def merge_files(self):
@@ -199,6 +201,7 @@ class Coordinator:
 if __name__ == "__main__":
 
     coordinator = Coordinator("./0_input/encyclopedia.txt")
+    #coordinator = Coordinator("./0_input/large_encyclopedia2.txt")
     coordinator.run()
 
 
